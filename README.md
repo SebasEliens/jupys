@@ -5,13 +5,13 @@ in-browser [JupyterLite](https://jupyterlite.readthedocs.io/) site via GitHub Pa
 
 ## Projects
 
-- [`piketty-complex-systems/`](piketty-complex-systems/) — reproducing Piketty's wealth-concentration claims with complex-systems models
-- [`colonial-extraction-gis/`](colonial-extraction-gis/) — GIS analysis of colonial resource extraction
+- [`content/piketty-complex-systems/`](content/piketty-complex-systems/) — reproducing Piketty's wealth-concentration claims with complex-systems models
+- [`content/colonial-extraction-gis/`](content/colonial-extraction-gis/) — GIS analysis of colonial resource extraction
 
 Each project has its own `pyproject.toml` / `.venv` for local development with `uv`:
 
 ```bash
-cd piketty-complex-systems
+cd content/piketty-complex-systems
 uv sync
 uv run jupyter lab
 ```
@@ -31,10 +31,11 @@ uv sync
 uv run jupyter lite serve --output-dir dist
 ```
 
-`scripts/build-lite.sh` stages both projects into a gitignored `content/`
-directory (excluding `.venv`, lockfiles, and other dev-only files — those
-don't apply inside the WASM runtime) and builds the site into `dist/`, then
-overlays the custom [index.html](index.html) landing page.
+`scripts/build-lite.sh` builds directly from [`content/`](content/) into
+`dist/`, then overlays the custom [index.html](index.html) landing page.
+[`content/.jupyterlite.ignore`](content/.jupyterlite.ignore) excludes
+`.venv`, lockfiles, and other dev-only files from the built site — those
+don't apply inside the WASM runtime.
 
 The landing page loads a hidden `/lab/` iframe in the background as soon as it
 opens, and the root [jupyter-lite.json](jupyter-lite.json) sets

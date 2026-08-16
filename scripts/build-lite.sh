@@ -1,25 +1,10 @@
 #!/usr/bin/env bash
-# Assembles the notebook projects into a staging content/ dir (excluding venvs,
-# lockfiles, and other dev-only cruft) and builds the JupyterLite site into dist/.
+# Builds the JupyterLite site from content/ into dist/. Dev-only files (.venv,
+# lockfiles, etc.) are excluded via content/.jupyterlite.ignore, not copying.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-PROJECTS=(piketty-complex-systems colonial-extraction-gis)
-
-rm -rf content dist .jupyterlite.doit.db
-mkdir -p content
-
-for proj in "${PROJECTS[@]}"; do
-  rsync -a \
-    --exclude='.venv/' \
-    --exclude='.python-version' \
-    --exclude='uv.lock' \
-    --exclude='pyproject.toml' \
-    --exclude='main.py' \
-    --exclude='__pycache__/' \
-    --exclude='.ipynb_checkpoints/' \
-    "$proj/" "content/$proj/"
-done
+rm -rf dist .jupyterlite.doit.db
 
 uv run jupyter lite build --contents content --output-dir dist
 cp index.html dist/index.html

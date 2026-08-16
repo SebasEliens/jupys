@@ -1,0 +1,12 @@
+{
+  "LiteBuildConfig": {
+    "extra_ignore_contents": [
+      "/\\.venv/",
+      "/\\.python-version$",
+      "/uv\\.lock$",
+      "/pyproject\\.toml$",
+      "/main\\.py$",
+      "/\\.gitignore$"
+    ]
+  }
+}
