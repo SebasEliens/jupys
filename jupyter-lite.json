@@ -3,7 +3,7 @@
   "jupyter-config-data": {
     "litePluginSettings": {
       "@jupyterlite/server-extension:kernels": {
-        "kernelBootstrapMode": "lazy"
+        "kernelBootstrapMode": "eager"
       }
     }
   }

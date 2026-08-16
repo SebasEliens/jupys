@@ -34,9 +34,14 @@ uv run jupyter lite serve --output-dir dist
 `scripts/build-lite.sh` stages both projects into a gitignored `content/`
 directory (excluding `.venv`, lockfiles, and other dev-only files — those
 don't apply inside the WASM runtime) and builds the site into `dist/`, then
-overlays the custom [index.html](index.html) landing page. The root
-[jupyter-lite.json](jupyter-lite.json) sets `kernelBootstrapMode: lazy` so the
-Pyodide kernel only loads once a notebook is actually opened.
+overlays the custom [index.html](index.html) landing page.
+
+The landing page loads a hidden `/lab/` iframe in the background as soon as it
+opens, and the root [jupyter-lite.json](jupyter-lite.json) sets
+`kernelBootstrapMode: eager` so that hidden load starts fetching the Pyodide
+kernel immediately — by the time you click a notebook, its assets are usually
+already cached. Clicking a notebook link shows a loading overlay while the
+real `/lab/` page navigates in.
 
 ### One-time GitHub setup
 

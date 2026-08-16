@@ -20,15 +20,62 @@
     }
     a:hover { border-color: #888; }
     .note { font-size: 0.85rem; color: #999; margin-top: 2rem; }
+
+    #loading-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(255, 255, 255, 0.95);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    #loading-overlay.visible { display: flex; }
+    .spinner {
+      width: 2.5rem;
+      height: 2.5rem;
+      border: 3px solid #ddd;
+      border-top-color: #1a1a1a;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    #loading-overlay p { color: #444; }
   </style>
 </head>
 <body>
   <h1>Notebook Experiments</h1>
-  <p class="sub">Runs in-browser via Pyodide. First click may take a few seconds to load the kernel.</p>
+  <p class="sub">Runs in-browser via Pyodide. The Python runtime starts loading in the background as soon as this page opens, so opening a notebook should feel quicker.</p>
   <ul>
     <li><a href="./lab/index.html?path=piketty-complex-systems/Piketty%20Complex%20Systems.ipynb">📈 Piketty Complex Systems</a></li>
     <li><a href="./lab/index.html?path=colonial-extraction-gis/Colonial%20Extraction%20GIS.ipynb">🗺️ Colonial Extraction GIS</a></li>
   </ul>
-  <p class="note">Powered by JupyterLite — nothing runs until you open a notebook.</p>
+  <p class="note">Powered by JupyterLite.</p>
+
+  <div id="loading-overlay">
+    <div class="spinner"></div>
+    <p>Opening notebook&hellip;</p>
+  </div>
+
+  <!-- Hidden warm-up: boots JupyterLite's Pyodide kernel in the background so its
+       assets are already cached by the browser by the time a notebook link is clicked. -->
+  <iframe id="warmup" style="display:none" aria-hidden="true" tabindex="-1"></iframe>
+
+  <script>
+    window.addEventListener('load', () => {
+      document.getElementById('warmup').src = './lab/index.html';
+    });
+
+    document.querySelectorAll('a[href^="./lab/"]').forEach((link) => {
+      link.addEventListener('click', (event) => {
+        event.preventDefault();
+        document.getElementById('loading-overlay').classList.add('visible');
+        const warmup = document.getElementById('warmup');
+        if (warmup) warmup.remove();
+        setTimeout(() => { window.location.href = link.href; }, 50);
+      });
+    });
+  </script>
 </body>
 </html>
