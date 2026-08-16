@@ -33,9 +33,9 @@ uv run jupyter lite serve --output-dir dist
 
 `scripts/build-lite.sh` builds directly from [`content/`](content/) into
 `dist/`, then overlays the custom [index.html](index.html) landing page.
-[`content/.jupyterlite.ignore`](content/.jupyterlite.ignore) excludes
-`.venv`, lockfiles, and other dev-only files from the built site — those
-don't apply inside the WASM runtime.
+[`jupyter_lite_config.json`](jupyter_lite_config.json) excludes `.venv`,
+lockfiles, and other dev-only files from the built site (via
+`extra_ignore_contents` regexes) — those don't apply inside the WASM runtime.
 
 The landing page loads a hidden `/lab/` iframe in the background as soon as it
 opens, and the root [jupyter-lite.json](jupyter-lite.json) sets
@@ -49,10 +49,13 @@ real `/lab/` page navigates in.
 After pushing this repo to GitHub: **Settings → Pages → Source → GitHub Actions**.
 The workflow handles the rest.
 
-### Known caveat
+### Pyodide compatibility
 
-`colonial-extraction-gis` fetches a GeoJSON file over the network with
-`urllib.request` and uses `geopandas`. Plain `urllib` sockets don't work inside
-Pyodide, and `geopandas` is a heavy WASM package — that cell may need patching
-(e.g. `pyodide-http`) or a pyfetch-based rewrite to run in the browser. Local
-`uv run jupyter lab` is unaffected.
+`colonial-extraction-gis` fetches data over the network (a GeoJSON file and a
+CSV) and uses `geopandas`. Plain `urllib` sockets don't work inside Pyodide
+(no TLS support in the WASM sandbox), so the fetch helper branches on
+`sys.platform == "emscripten"` and uses `pyodide.http.pyfetch` there, falling
+back to `urllib.request` for a normal local kernel. `geopandas` itself loads
+and runs fine under Pyodide. Verified end-to-end (network fetch, GeoJSON
+parsing, all cells) against a real `jupyterlite-pyodide-kernel`-equivalent
+Pyodide run, not just locally.
