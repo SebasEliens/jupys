@@ -1,0 +1,10 @@
+[project]
+name = "jupys-lite-build"
+version = "0.1.0"
+description = "JupyterLite build tooling for the notebook experiments in this repo"
+requires-python = ">=3.11"
+dependencies = [
+    "jupyterlite-core",
+    "jupyterlite-pyodide-kernel",
+    "jupyter-server",
+]

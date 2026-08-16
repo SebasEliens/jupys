@@ -1,0 +1,52 @@
+# jupys
+
+Notebook experiments, each a standalone `uv` project, published as a live
+in-browser [JupyterLite](https://jupyterlite.readthedocs.io/) site via GitHub Pages.
+
+## Projects
+
+- [`piketty-complex-systems/`](piketty-complex-systems/) — reproducing Piketty's wealth-concentration claims with complex-systems models
+- [`colonial-extraction-gis/`](colonial-extraction-gis/) — GIS analysis of colonial resource extraction
+
+Each project has its own `pyproject.toml` / `.venv` for local development with `uv`:
+
+```bash
+cd piketty-complex-systems
+uv sync
+uv run jupyter lab
+```
+
+## Browser version (JupyterLite)
+
+Notebooks and their local data files are bundled into a static site that runs
+entirely in the browser via Pyodide/WASM — no server, no install. It auto-deploys
+to GitHub Pages on every push to `main` (see
+[.github/workflows/deploy-pages.yml](.github/workflows/deploy-pages.yml)).
+
+To build and preview locally:
+
+```bash
+uv sync
+./scripts/build-lite.sh
+uv run jupyter lite serve --output-dir dist
+```
+
+`scripts/build-lite.sh` stages both projects into a gitignored `content/`
+directory (excluding `.venv`, lockfiles, and other dev-only files — those
+don't apply inside the WASM runtime) and builds the site into `dist/`, then
+overlays the custom [index.html](index.html) landing page. The root
+[jupyter-lite.json](jupyter-lite.json) sets `kernelBootstrapMode: lazy` so the
+Pyodide kernel only loads once a notebook is actually opened.
+
+### One-time GitHub setup
+
+After pushing this repo to GitHub: **Settings → Pages → Source → GitHub Actions**.
+The workflow handles the rest.
+
+### Known caveat
+
+`colonial-extraction-gis` fetches a GeoJSON file over the network with
+`urllib.request` and uses `geopandas`. Plain `urllib` sockets don't work inside
+Pyodide, and `geopandas` is a heavy WASM package — that cell may need patching
+(e.g. `pyodide-http`) or a pyfetch-based rewrite to run in the browser. Local
+`uv run jupyter lab` is unaffected.
