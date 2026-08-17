@@ -37,12 +37,18 @@ uv run jupyter lite serve --output-dir dist
 lockfiles, and other dev-only files from the built site (via
 `extra_ignore_contents` regexes) — those don't apply inside the WASM runtime.
 
-The landing page loads a hidden `/lab/` iframe in the background as soon as it
-opens, and the root [jupyter-lite.json](jupyter-lite.json) sets
-`kernelBootstrapMode: eager` so that hidden load starts fetching the Pyodide
-kernel immediately — by the time you click a notebook, its assets are usually
-already cached. Clicking a notebook link shows a loading overlay while the
-real `/lab/` page navigates in.
+The root [jupyter-lite.json](jupyter-lite.json) sets
+`kernelBootstrapMode: eager`, so the Pyodide kernel starts loading as soon as
+`/lab/` renders rather than waiting for a cell to run. Clicking a notebook
+link on the landing page shows a loading overlay while `/lab/` navigates in —
+the first open still has to download the Python runtime itself, which can
+take the better part of a minute; later visits are cached and much faster.
+
+(An earlier version of this page also pre-warmed Pyodide via a hidden
+background `/lab/` iframe on page load. That created a second live JupyterLite
+instance sharing the same IndexedDB-backed state as the one you'd navigate to,
+and tearing it down right before navigating could leave the real page hung on
+a lock that never released — showing up as a blank page. Removed.)
 
 ### One-time GitHub setup
 

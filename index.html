@@ -46,7 +46,7 @@
 </head>
 <body>
   <h1>Notebook Experiments</h1>
-  <p class="sub">Runs in-browser via Pyodide. The Python runtime starts loading in the background as soon as this page opens, so opening a notebook should feel quicker.</p>
+  <p class="sub">Runs in-browser via Pyodide. The first open downloads the Python runtime and can take a minute or so &mdash; subsequent visits are cached and much faster.</p>
   <ul>
     <li><a href="./lab/index.html?path=piketty-complex-systems/Piketty%20Complex%20Systems.ipynb">📈 Piketty Complex Systems</a></li>
     <li><a href="./lab/index.html?path=colonial-extraction-gis/Colonial%20Extraction%20GIS.ipynb">🗺️ Colonial Extraction GIS</a></li>
@@ -58,21 +58,11 @@
     <p>Opening notebook&hellip;</p>
   </div>
 
-  <!-- Hidden warm-up: boots JupyterLite's Pyodide kernel in the background so its
-       assets are already cached by the browser by the time a notebook link is clicked. -->
-  <iframe id="warmup" style="display:none" aria-hidden="true" tabindex="-1"></iframe>
-
   <script>
-    window.addEventListener('load', () => {
-      document.getElementById('warmup').src = './lab/index.html';
-    });
-
     document.querySelectorAll('a[href^="./lab/"]').forEach((link) => {
       link.addEventListener('click', (event) => {
         event.preventDefault();
         document.getElementById('loading-overlay').classList.add('visible');
-        const warmup = document.getElementById('warmup');
-        if (warmup) warmup.remove();
         setTimeout(() => { window.location.href = link.href; }, 50);
       });
     });
